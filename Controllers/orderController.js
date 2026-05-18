@@ -158,7 +158,12 @@ product_data: {
     cancel_url: `${req.protocol}://${req.get('host')}/cart`,
     customer_email: req.user.email,
     client_reference_id: req.params.cartId,
-    metadata: req.body.shippingAddress,
+metadata: {
+  details: req.query.details,
+  phone: req.query.phone,
+  city: req.query.city,
+  postalCode: req.query.postalCode,
+},
   });
 
   // 4) send session to response
@@ -167,7 +172,12 @@ product_data: {
 
 const createCardOrder = async (session) => {
   const cartId = session.client_reference_id;
-  const shippingAddress = session.metadata;
+  const shippingAddress = {
+    details: session.metadata.details,
+    phone: session.metadata.phone,
+    city: session.metadata.city,
+    postalCode: session.metadata.postalCode,
+  };
   const oderPrice = session.amount_total / 100;
 
   const cart = await Cart.findById(cartId);

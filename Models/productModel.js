@@ -93,15 +93,24 @@ productSchema.pre(/^find/, function (next) {
 });
 
 const setImageURL = (doc) => {
+  const baseUrl = process.env.BASE_URL || '';
+
   if (doc.imageCover) {
-    const imageUrl = `${process.env.BASE_URL}/products/${doc.imageCover}`;
-    doc.imageCover = imageUrl;
+    // لو الغلاف رابط كامل جاهز، سيبها زي ما هي، غير كده ادمجها
+    if (!doc.imageCover.startsWith('http://') && !doc.imageCover.startsWith('https://')) {
+      doc.imageCover = `${baseUrl}/products/${doc.imageCover}`;
+    }
   }
-  if (doc.images) {
+  
+  if (doc.images && doc.images.length > 0) {
     const imagesList = [];
     doc.images.forEach((image) => {
-      const imageUrl = `${process.env.BASE_URL}/products/${image}`;
-      imagesList.push(imageUrl);
+      // لو الصورة رابط كامل جاهز، ضيفها عل طول، غير كده ادمجها
+      if (image.startsWith('http://') || image.startsWith('https://')) {
+        imagesList.push(image);
+      } else {
+        imagesList.push(`${baseUrl}/products/${image}`);
+      }
     });
     doc.images = imagesList;
   }

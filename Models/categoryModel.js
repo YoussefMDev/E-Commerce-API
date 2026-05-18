@@ -21,7 +21,13 @@ const categorySchema = new mongoose.Schema(
 
 const setImageURL = (doc) => {
   if (doc.image) {
-    const imageUrl = `${process.env.BASE_URL}/categories/${doc.image}`;
+    // لو الصورة رابط كامل جاهز، سيبها زي ما هي
+    if (doc.image.startsWith('http://') || doc.image.startsWith('https://')) {
+      return;
+    }
+    // لو اسم ملف عادي، ادمج معاه رابط السيرفر
+    const baseUrl = process.env.BASE_URL || '';
+    const imageUrl = `${baseUrl}/categories/${doc.image}`;
     doc.image = imageUrl;
   }
 };
